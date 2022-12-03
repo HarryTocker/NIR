@@ -4,6 +4,9 @@ import com.find.law.portal.repositories.entities.LawEntity;
 import com.find.law.portal.repositories.entities.LawPartEntity;
 import com.find.law.portal.repositories.entities.LawPartPunishEntity;
 
+/**
+ * Исключение при обновлении закона.
+ */
 public class LawUpdaterException extends RuntimeException {
     public LawUpdaterException(LawEntity law, String message, Exception cause) {
         super("Could not update law [%s]: %s".formatted(law.getArticle(), message), cause);

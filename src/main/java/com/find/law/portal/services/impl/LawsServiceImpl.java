@@ -1,10 +1,7 @@
 package com.find.law.portal.services.impl;
 
-import com.find.law.portal.law.LawComparator;
 import com.find.law.portal.repositories.LawRepository;
 import com.find.law.portal.repositories.entities.LawEntity;
-import com.find.law.portal.repositories.entities.LawPartEntity;
-import com.find.law.portal.repositories.entities.LawPartPunishEntity;
 import com.find.law.portal.services.LawsService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -12,19 +9,20 @@ import org.thymeleaf.util.StringUtils;
 
 import java.util.List;
 
+/**
+ * Реализация сервиса для работы с законами.
+ */
 @Service
 public class LawsServiceImpl implements LawsService {
     private final LawRepository lawRepository;
 
-    private final LawComparator lawComparator;
-
     public LawsServiceImpl(LawRepository lawRepository) {
         this.lawRepository = lawRepository;
-        this.lawComparator = new LawComparator();
     }
 
     @Override
     public LawEntity findLaw(String article, String text) {
+        // Если указана статья закона, например 105, выполняем поиск только по ней.
         if (article != null && !StringUtils.isEmptyOrWhitespace(article)) {
             return lawRepository.findById(article).orElseThrow(() -> new EntityNotFoundException("Law with specified id [%s] not found".formatted(article)));
         }
@@ -33,6 +31,8 @@ public class LawsServiceImpl implements LawsService {
             throw new EntityNotFoundException("Cannot search because text is empty");
         }
 
+        // Если статья не указана, ищем по тексту. Пробелы в тексте заменяются на символ '%'.
+        // Это сделано для того, чтобы при указанном тексте "Причинение вреда здоровью" в базе данных были найдены результаты "Умышленное причинение тяжкого вреда здоровью".
         String search = text.replaceAll("\s+", " ").replaceAll("\s", "%");
         List<LawEntity> laws = lawRepository.searchAllByNameLike(search);
         if (laws.size() == 0) {
@@ -40,23 +40,5 @@ public class LawsServiceImpl implements LawsService {
         }
 
         return laws.get(0);
-    }
-
-    @Override
-    public LawPartPunishEntity findMaxPunishment(LawPartEntity part) {
-        List<LawPartPunishEntity> punishments = part.getPunishments();
-        if (punishments.size() == 1) {
-            return punishments.get(0);
-        }
-
-        LawPartPunishEntity current = punishments.get(0);
-        for (int i = 1; i < punishments.size(); i++) {
-            LawPartPunishEntity other = punishments.get(i);
-            if (lawComparator.comparePunishments(current, other)) {
-                current = other;
-            }
-        }
-
-        return current;
     }
 }

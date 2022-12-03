@@ -1,8 +1,13 @@
-package com.find.law.portal.law;
+package com.find.law.portal.law.comparators;
 
-import com.find.law.portal.repositories.entities.LawPartPunishEntity;
+import com.find.law.portal.controllers.dto.LawPartPunishmentDataDto;
 
-public class LawComparator {
+import java.util.Comparator;
+
+/**
+ * Компаратор наказаний по части закона. Наказания сортируются от самого минимального до максимально возможного.
+ */
+public class LawPartPunishmentComparator implements Comparator<LawPartPunishmentDataDto> {
     private final String[] sortedPunishments = new String[] {
             "Штраф",
             "Лишение права занимать определенные должности или заниматься определенной деятельностью",
@@ -16,11 +21,12 @@ public class LawComparator {
             "Пожизненное заключение"
     };
 
-    public boolean comparePunishments(LawPartPunishEntity current, LawPartPunishEntity other) {
+    @Override
+    public int compare(LawPartPunishmentDataDto current, LawPartPunishmentDataDto other) {
         int currentCost = getCost(current.getType());
         int otherCost = getCost(other.getType());
 
-        return otherCost > currentCost;
+        return currentCost - otherCost;
     }
 
     private int getCost(String type) {

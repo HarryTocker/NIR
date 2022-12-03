@@ -1,7 +1,11 @@
-package com.find.law.portal.law;
+package com.find.law.portal.law.parsers;
 
 import com.find.law.portal.exceptions.LawParseException;
-import com.find.law.portal.law.dto.LawApiResponseDto;
+import com.find.law.portal.law.data.LawData;
+import com.find.law.portal.law.LawParser;
+import com.find.law.portal.law.data.LawPartData;
+import com.find.law.portal.law.data.LawPartPunishData;
+import com.find.law.portal.law.parsers.dto.LawApiResponseDto;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import org.jsoup.Jsoup;
@@ -21,19 +25,40 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Парсер законов из удаленного источника.
+ */
 public class RemoteLawParser implements LawParser {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    /**
+     * Путь удаленного источника.
+     */
     private final URL url;
 
+    /**
+     * Паттерн статьи закона.
+     */
     private final Pattern lawDataPattern = Pattern.compile("Статья (\\d+). (\\D+)");
 
+    /**
+     * Паттерн некорректной строки, которую не нужно использовать во время парсинга.
+     */
     private final Pattern incorrectPart = Pattern.compile("(^\\W\\))|(^\\W\\d+\\))|(\\(Ч)|(\\(Д)|(\\(С)|(\\(Н)|(^Примечан)|(^ГЛАВА)|(^Раздел)");
 
+    /**
+     * Паттерн штрафа.
+     */
     private final Pattern penaltyPart = Pattern.compile("в размере до (\\D+) рублей");
 
+    /**
+     * Паттерн для исключения части закона.
+     */
     private final Pattern lostPart = Pattern.compile("Часть утратила силу");
 
+    /**
+     * Паттерн окончания парсинга.
+     */
     private final Pattern endPart = Pattern.compile("Президент Российской Федерации");
 
     public RemoteLawParser(URL url) {
@@ -44,14 +69,24 @@ public class RemoteLawParser implements LawParser {
     public List<LawData> parseLaws() throws IOException {
         Document rawPage;
         try (InputStream stream = url.openStream()) {
+            // Получаем ответ из удаленного источника в JSON формате.
             logger.info("Getting response from remote API {}", url);
             JsonReader reader = new JsonReader(new InputStreamReader(stream));
             LawApiResponseDto dto = new Gson().fromJson(reader, LawApiResponseDto.class);
-            rawPage = Jsoup.parse(dto.RedText);
+            // JSON ответа содержит два поля: Error и RedText.
+            // Если Error не пуст, произошла ошибка при получении ответа.
+            if (dto.getError() != null && StringUtils.isEmptyOrWhitespace(dto.getError())) {
+                throw new IOException(dto.getError());
+            }
+
+            // Если ошибки нет, парсим ответ из RedText. Ответ в RedText содержится в формате HTML.
+            rawPage = Jsoup.parse(dto.getRedText());
         }
 
+        // Получаем элемент с ID p529. С него начинается основная часть законов.
         Element current = rawPage.getElementById("p529");
-        List<LawData> laws = new ArrayList<>(300);
+        // Создаем список под 350 законов (с запасом).
+        List<LawData> laws = new ArrayList<>(350);
 
         if (current == null) {
             throw new RuntimeException("");
@@ -64,11 +99,14 @@ public class RemoteLawParser implements LawParser {
             try {
                 if (current.hasText()) {
                     String text = current.text();
+                    // Если достигли конца, завершаем цикл.
                     if (endPart.matcher(text).find()) {
                         break;
                     }
 
+                    // Если некорректная строка, пропускаем ее.
                     if (incorrectPart.matcher(text).find() || StringUtils.isEmptyOrWhitespace(text)) {
+                        // Если пункт утратил силу пропускаем его.
                         if (lostPart.matcher(text).find()) {
                             law = null;
                             lawPart = null;
@@ -91,6 +129,7 @@ public class RemoteLawParser implements LawParser {
                         }
                     }
 
+                    // Если текст начинается со статьи, сохраняем предыдущую, если имеется, и начинаем новую.
                     if (text.startsWith("Статья")) {
                         if (law != null) {
                             if (lawPart != null) {
@@ -111,6 +150,7 @@ public class RemoteLawParser implements LawParser {
                             law = new LawData(number, name, new ArrayList<>(10));
                         }
                     } else if (text.startsWith("наказывается") || text.startsWith("наказываются")) {
+                        // Если строка содержит наказания, парсим их в текущую часть статьи.
                         if (lawPart == null) {
                             continue;
                         }
@@ -174,6 +214,7 @@ public class RemoteLawParser implements LawParser {
                             }
                         }
                     } else {
+                        // Парсим часть статьи для которой будут указанны наказания.
                         if (lawPart != null && law != null) {
                             law.getParts().add(lawPart);
                         }

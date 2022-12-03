@@ -1,5 +1,7 @@
 package com.find.law.portal.law;
 
+import com.find.law.portal.law.data.LawData;
+
 import java.io.IOException;
 import java.util.List;
 

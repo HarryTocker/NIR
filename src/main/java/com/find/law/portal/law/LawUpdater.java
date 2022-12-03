@@ -1,6 +1,9 @@
 package com.find.law.portal.law;
 
 import com.find.law.portal.exceptions.LawUpdaterException;
+import com.find.law.portal.law.data.LawData;
+import com.find.law.portal.law.data.LawPartData;
+import com.find.law.portal.law.data.LawPartPunishData;
 import com.find.law.portal.repositories.LawPartPunishRepository;
 import com.find.law.portal.repositories.LawPartRepository;
 import com.find.law.portal.repositories.LawRepository;
@@ -44,6 +47,8 @@ public class LawUpdater {
      * При возникновении ошибки, данные не будут сохранены.
      */
     public synchronized void update() {
+        // Создание транзакции в рамках которой будет выполняться обновление.
+        // Необходимо для того, чтобы при возникновении ошибки данные не были сохранены в БД и произошел откат.
         TransactionTemplate template = new TransactionTemplate(transactionManager);
         template.setReadOnly(false);
         template.executeWithoutResult(transactionStatus -> {
@@ -58,6 +63,7 @@ public class LawUpdater {
 
     private void updateLaws() {
         try {
+            // Получаем распарсенные законы.
             logger.info("Start parsing laws from source");
             List<LawData> laws = lawParser.parseLaws();
 

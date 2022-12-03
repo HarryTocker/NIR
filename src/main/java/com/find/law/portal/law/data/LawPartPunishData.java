@@ -1,16 +1,14 @@
-package com.find.law.portal.controllers.dto;
+package com.find.law.portal.law.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
- * DTO объект наказания по части закона.
+ * Данные наказания по части закона для парсинга.
  */
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class LawPartPunishmentDataDto {
+public class LawPartPunishData {
     /**
      * Тип наказания.
      */
@@ -19,12 +17,12 @@ public class LawPartPunishmentDataDto {
     /**
      * Минимальный срок наказания.
      */
-    private String minTime;
+    private String min;
 
     /**
      * Максимальный срок наказания.
      */
-    private String maxTime;
+    private String max;
 
     /**
      * Тип времени наказания.
@@ -34,5 +32,5 @@ public class LawPartPunishmentDataDto {
     /**
      * Является ли наказание пожизненным.
      */
-    private Boolean isLifeTime;
+    private boolean isLifeTime;
 }
