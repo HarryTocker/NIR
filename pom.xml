@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.find.law</groupId>
     <artifactId>Portal</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
     <name>FindLaw</name>
     <description>FindLaw</description>
     <properties>
