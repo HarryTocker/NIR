@@ -11,6 +11,8 @@ import com.google.gson.stream.JsonReader;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.parser.HtmlTreeBuilder;
+import org.jsoup.parser.Parser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.util.StringUtils;
@@ -19,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -71,7 +74,7 @@ public class RemoteLawParser implements LawParser {
         try (InputStream stream = url.openStream()) {
             // Получаем ответ из удаленного источника в JSON формате.
             logger.info("Getting response from remote API {}", url);
-            JsonReader reader = new JsonReader(new InputStreamReader(stream));
+            JsonReader reader = new JsonReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
             LawApiResponseDto dto = new Gson().fromJson(reader, LawApiResponseDto.class);
             // JSON ответа содержит два поля: Error и RedText.
             // Если Error не пуст, произошла ошибка при получении ответа.
@@ -80,7 +83,7 @@ public class RemoteLawParser implements LawParser {
             }
 
             // Если ошибки нет, парсим ответ из RedText. Ответ в RedText содержится в формате HTML.
-            rawPage = Jsoup.parse(dto.getRedText());
+            rawPage = Jsoup.parse(dto.getRedText(), new Parser(new HtmlTreeBuilder()));
         }
 
         // Получаем элемент с ID p529. С него начинается основная часть законов.
@@ -105,7 +108,7 @@ public class RemoteLawParser implements LawParser {
                     }
 
                     // Если некорректная строка, пропускаем ее.
-                    if (incorrectPart.matcher(text).find() || StringUtils.isEmptyOrWhitespace(text)) {
+                    if (incorrectPart.matcher(text).find() || text.startsWith("(Положения") || StringUtils.isEmptyOrWhitespace(text)) {
                         // Если пункт утратил силу пропускаем его.
                         if (lostPart.matcher(text).find()) {
                             law = null;
