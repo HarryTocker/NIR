@@ -1,21 +1,23 @@
 package com.find.law.portal.controllers;
 
-import com.find.law.portal.controllers.dto.ErrorResponseDto;
-import com.find.law.portal.controllers.dto.LawDataDto;
-import com.find.law.portal.law.comparators.LawPartPunishmentComparator;
-import com.find.law.portal.mappers.LawDataMapper;
-import com.find.law.portal.repositories.entities.LawEntity;
+import com.find.law.portal.controllers.dto.errors.ErrorResponseDto;
+import com.find.law.portal.controllers.dto.generic.LawPartWithCrimeCategoryDto;
+import com.find.law.portal.controllers.dto.generic.LawWithCrimeCategoryDto;
+import com.find.law.portal.controllers.dto.generic.LawsByTypeDto;
+import com.find.law.portal.core.content.categories.CrimeCategoryData;
+import com.find.law.portal.core.content.laws.*;
+import com.find.law.portal.core.utils.pair.Pair;
+import com.find.law.portal.core.utils.tuple.Tuple;
+import com.find.law.portal.localization.LocalizationService;
 import com.find.law.portal.services.LawsService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.util.StringUtils;
 
-import java.util.Collections;
+import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,11 +39,22 @@ public class LawsController {
 
     private final LawsService lawsService;
 
-    private final LawDataMapper lawDataMapper;
+    private final LocalizationService localizationService;
 
-    public LawsController(LawsService lawsService, LawDataMapper lawDataMapper) {
+    public LawsController(LawsService lawsService, LocalizationService localizationService) {
         this.lawsService = lawsService;
-        this.lawDataMapper = lawDataMapper;
+        this.localizationService = localizationService;
+    }
+
+    @GetMapping(value = "/types", produces = "application/json")
+    public ResponseEntity<LawsByTypeDto> getLawsByType() {
+        return ResponseEntity.ok(lawsService.getLawsByType());
+    }
+
+    @PostMapping(value = "/types")
+    public ResponseEntity<?> updateLawsType(@RequestBody LawsByTypeDto lawsType) {
+        lawsService.updateLawsType(lawsType);
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -51,8 +64,8 @@ public class LawsController {
      * @return LawDataDto - успешно. ErrorResponse - при возникновении ошибки.
      */
     @GetMapping(value = "/find/max_punishment/{searchText}", produces = "application/json")
-    public ResponseEntity<?> findMaxPunishmentForLaw(@PathVariable String searchText) {
-        if (searchText == null || StringUtils.isEmptyOrWhitespace(searchText)) {
+    public ResponseEntity<?> findMaxPunishmentForLaw(@PathVariable String searchText, HttpServletRequest request) {
+        if (StringUtils.isEmptyOrWhitespace(searchText)) {
             return ResponseEntity.badRequest().body(new ErrorResponseDto(0, "Невозможно выполнить поиск по пустой строке", null));
         }
 
@@ -66,28 +79,39 @@ public class LawsController {
                 article = articleMatcher.group();
             }
 
-            LawEntity law = lawsService.findLaw(article, text);
+            var lawWithMaxPunishment = lawsService.findLawWithMaxPunishment(article, text);
 
-            LawDataDto response = lawDataMapper.map(law);
-
-            // Если в законе больше одной части нужно проверить есть ли в запросе указание конкретной части.
-            if (response.getParts().size() != 1) {
-                // Пытаемся найти часть. Например, поиск по тексту "УК РФ 105 часть 2" возьмет первый результат, который начинается на "2".
-                Matcher partMatcher = partPattern.matcher(searchText);
-                final String partText = partMatcher.find() ? partMatcher.group().replaceAll("\\D+", "") : null;
-
-                if (partText != null) {
-                    response.setParts(Collections.singleton(response.getParts().stream().filter(part -> part.getPart().startsWith(partText)).findFirst().orElseThrow()));
-                }
-            }
-
-            // Получаем максимальное наказание для каждой части.
-            response.getParts().forEach(part -> part.setPunishments(Collections.singleton(part.getPunishments().stream().max(new LawPartPunishmentComparator()).orElseThrow())));
-
-            return ResponseEntity.ok(response);
-        } catch (Exception cause) {
+            return ResponseEntity.ok(localizationService.localize(convertToLawWithCrimeCategory(lawWithMaxPunishment), request));
+        } catch (Throwable cause) {
             logger.error("Failed to get law data: {}", cause.getMessage());
             return ResponseEntity.status(404).body(new ErrorResponseDto(1, "Не удалось найти указанный закон", cause.getMessage()));
         }
+    }
+
+    private LawWithCrimeCategoryDto convertToLawWithCrimeCategory(Pair<LawData, Collection<Tuple<LawPartData, LawPartPunishData, Pair<CrimeCategoryData, CrimeCategoryData>>>> lawWithMaxPunishment) {
+        var law = lawWithMaxPunishment.first();
+
+        return LawWithCrimeCategoryDto.builder()
+                .article(law.getArticle())
+                .name(law.getName())
+                .type(law.getType())
+                .parts(lawWithMaxPunishment.second().stream().map(tuple -> {
+                    var builder = LawPartWithCrimeCategoryDto.builder()
+                            .name(tuple.first().getName())
+                            .partPunishType(tuple.second().getType())
+                            .categoryType(tuple.third().first().getCategoryType());
+
+                    if (tuple.second().isLifeTime()) {
+                        builder.isLifeTime(true);
+                    } else {
+                        builder.isLifeTime(false);
+                        builder.punishType(tuple.second().getMax().getType());
+                        builder.number(tuple.second().getMax().getNumber());
+                    }
+
+                    tuple.third().optionalSecond().ifPresent(category -> builder.optionalCategoryType(category.getCategoryType()));
+                    return builder.build();
+                }).toList())
+                .build();
     }
 }

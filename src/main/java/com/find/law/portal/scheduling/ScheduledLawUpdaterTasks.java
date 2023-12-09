@@ -1,6 +1,6 @@
 package com.find.law.portal.scheduling;
 
-import com.find.law.portal.law.LawUpdater;
+import com.find.law.portal.core.updater.LawUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,10 +21,10 @@ public class ScheduledLawUpdaterTasks {
     private int updateCount = 0;
 
     @Value("${portal.laws.updater.update-enable:true}")
-    private String shouldUpdateLaws;
+    private boolean shouldUpdateLaws;
 
     @Value("${portal.laws.updater.update-on-start:false}")
-    private String shouldUpdateLawsOnStart;
+    private boolean shouldUpdateLawsOnStart;
 
     public ScheduledLawUpdaterTasks(LawUpdater lawUpdater) {
         this.lawUpdater = lawUpdater;
@@ -35,27 +35,26 @@ public class ScheduledLawUpdaterTasks {
      */
     @Scheduled(timeUnit = TimeUnit.HOURS, fixedRate = 24)
     public void updateLaws() {
-        logger.info("Start update laws by scheduled task");
+        logger.info("Start update laws by scheduled task.");
 
         // Если обновление законов отключено через настройки - пропускаем задачу.
-        if (!shouldUpdateLaws.equals("true")) {
+        if (!shouldUpdateLaws) {
             logger.info("Update laws disabled by settings.");
             return;
         }
 
         // Если обновление законов при запуске отключено через настройки - пропускаем задачу.
-        if (updateCount++ == 0 && !shouldUpdateLawsOnStart.equals("true")) {
+        if (updateCount++ == 0 && !shouldUpdateLawsOnStart) {
             logger.info("Update laws on startup disabled by setting.");
             return;
         }
 
+        logger.info("Update task number [{}] is started.", updateCount);
         try {
             lawUpdater.update();
-        } catch (Exception exception) {
-            logger.error("An error occurred while updating laws: {}", exception);
-            return;
+            logger.info("Laws have been successfully updated by task number [{}]", updateCount);
+        } catch (Throwable exception) {
+            logger.error("An error occurred while updating laws by task number [{}]: {}", updateCount, exception.toString());
         }
-
-        logger.info("Laws have been successfully updated.");
     }
 }

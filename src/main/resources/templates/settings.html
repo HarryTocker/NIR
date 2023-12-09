@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="#{portal.ui.pages.title.settings}"></title>
+  <script src="/js/jquery.js"></script>
+  <script src="/js/utils.js"></script>
+  <script src="/js/fragments/header.js"></script>
+  <script src="/js/fragments/settings_page.js"></script>
+  <script src="/js/services/law_services.js"></script>
+  <script src="/js/constants.js"></script>
+  <link rel="stylesheet" href="/css/page.css">
+  <link rel="stylesheet" href="/css/elements.css">
+  <link rel="stylesheet" href="/css/header.css">
+  <link rel="stylesheet" href="/css/settings.css">
+</head>
+<body>
+  <div th:replace="~{fragments/header :: header}"></div>
+  <div class="page_content">
+    <div th:replace="~{fragments/settings_page :: settings_bar}"></div>
+    <div th:replace="~{fragments/settings_page :: settings_tabs}"></div>
+  </div>
+</body>
+</html>

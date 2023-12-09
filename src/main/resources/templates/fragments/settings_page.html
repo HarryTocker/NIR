@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Settings Tabs</title>
+</head>
+<body>
+    <div class="settings_generic_bar" th:fragment="settings_bar">
+        <div class="rounded_edges outline_selected pressed_element logout_button">
+            <p th:text="#{portal.ui.button.logout}"></p>
+        </div>
+    </div>
+    <div class="settings_tabs_container" th:fragment="settings_tabs">
+        <div class="settings_tabs">
+            <button class="pressed_element settings_tabs_tablinks" onclick="changeTab('settings_tab_law_types')" th:text="#{portal.ui.button.settings.lawtypes}"></button>
+        </div>
+        <div class="settings_tab_content">
+            <div class="tab_content" id="settings_tab_law_types" th:fragment="settings_tabs_law_types">
+                <div class="settings_tab_law_types_select_buttons">
+                    <div class="settings_tab_law_types_table_column">
+                        <p style="margin-top: 20px" th:text="#{portal.ui.element.label.settings.lawtypes.table.intentional}">
+                    </div>
+                    <div class="settings_tab_law_types_table_column">
+                        <p style="margin-top: 20px" th:text="#{portal.ui.element.label.settings.lawtypes.table.negligence}">
+                    </div>
+                    <div class="settings_tab_law_types_table_column">
+                        <p style="margin-top: 20px" th:text="#{portal.ui.element.label.settings.lawtypes.table.unknown}">
+                    </div>
+                </div>
+                <div class="settings_tab_law_types_container">
+                    <div class="settings_tab_law_types_table_column" id="intentional_law_types_table">
+
+                    </div>
+
+                    <div class="settings_tab_law_types_table_column" id="negligence_law_types_table">
+
+                    </div>
+
+                    <div class="settings_tab_law_types_table_column" id="unknown_law_types_table">
+
+                    </div>
+                </div>
+                <div class="settings_tab_law_types_select_buttons">
+                    <div class="settings_tab_law_types_table_column">
+                        <div class="rounded_edges pressed_element outline_selected settings_tab_law_types_move_button" onclick="moveLawElementToTable('intentional_law_types_table', 'negligence_law_types_table')">
+                            <p th:text="#{portal.ui.button.settings.lawtypes.move.to.negligence}"></p>
+                        </div>
+                        <div class="rounded_edges pressed_element outline_selected settings_tab_law_types_move_button" onclick="moveLawElementToTable('intentional_law_types_table', 'unknown_law_types_table')">
+                            <p th:text="#{portal.ui.button.settings.lawtypes.move.to.unknown}"></p>
+                        </div>
+                    </div>
+                    <div class="settings_tab_law_types_table_column">
+                        <div class="rounded_edges pressed_element outline_selected settings_tab_law_types_move_button" onclick="moveLawElementToTable('negligence_law_types_table', 'intentional_law_types_table')">
+                            <p th:text="#{portal.ui.button.settings.lawtypes.move.to.intentional}"></p>
+                        </div>
+                        <div class="rounded_edges pressed_element outline_selected settings_tab_law_types_move_button" onclick="moveLawElementToTable('negligence_law_types_table', 'unknown_law_types_table')">
+                            <p th:text="#{portal.ui.button.settings.lawtypes.move.to.unknown}"></p>
+                        </div>
+                    </div>
+                    <div class="settings_tab_law_types_table_column">
+                        <div class="rounded_edges pressed_element outline_selected settings_tab_law_types_move_button" onclick="moveLawElementToTable('unknown_law_types_table', 'intentional_law_types_table')">
+                            <p th:text="#{portal.ui.button.settings.lawtypes.move.to.intentional}"></p>
+                        </div>
+                        <div class="rounded_edges pressed_element outline_selected settings_tab_law_types_move_button" onclick="moveLawElementToTable('unknown_law_types_table', 'negligence_law_types_table')">
+                            <p th:text="#{portal.ui.button.settings.lawtypes.move.to.negligence}"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings_tab_law_types_select_buttons">
+                    <div class="rounded_edges pressed_element outline_selected settings_tab_law_types_save_button" onclick="saveAllLaws()">
+                        <p th:text="#{portal.ui.button.settings.lawtypes.save}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

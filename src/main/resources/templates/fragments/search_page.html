@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Main Page</title>
+</head>
+<body>
+<div class="search_page_container" th:fragment="search_page">
+    <div class="search_input_container">
+        <div id="error_container" class="search_input_container_error">
+        </div>
+        <div class="search_input_container_bar">
+            <div class="search_input_container_bar_center">
+                <label class="rounded_edges middle search_bar" for="search_input">
+                    <div class="input_field">
+                        <input id="search_input" th:name="#{portal.ui.button.search.field}">
+                    </div>
+                    <div class="pressed_element input_button" onclick="findLaw()">
+                        <p th:text="#{portal.ui.button.search}"></p>
+                    </div>
+                </label>
+            </div>
+        </div>
+    </div>
+    <div id="result_container" class="search_result_container">
+
+    </div>
+</div>
+</body>
+</html>

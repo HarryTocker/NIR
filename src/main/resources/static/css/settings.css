@@ -1,0 +1,108 @@
+.settings_generic_bar {
+    width: 100%;
+    height: 100px;
+}
+
+.settings_tabs_container {
+    width: 100%;
+    height: 700px;
+}
+
+.logout_button {
+    justify-content: center;
+    float: right;
+    margin-top: 25px;
+    margin-right: 8%;
+    width: 100px;
+    height: 50px;
+}
+
+.settings_tabs {
+    width: 84%;
+    height: 10%;
+    margin-left: 8%;
+    overflow: hidden;
+    border: 2px solid #c5c5c5;
+    /*background-color: #f1f1f1;*/
+}
+
+.settings_tabs_tablinks {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    font-size: 18px;
+    height: 100%;
+}
+
+.settings_tab_content {
+    width: 84%;
+    height: 90%;
+    margin-left: 8%;
+    overflow: auto;
+}
+
+.tab_content {
+    display: none;
+    width: 100%;
+    height: 100%;
+}
+
+.settings_tab_law_types_container {
+    display: inherit;
+    width: 100%;
+    height: 80%;
+}
+
+.settings_tab_law_types_select_buttons {
+    display: inherit;
+    width: 100%;
+    height: 10%;
+}
+
+.settings_tab_law_types_move_button {
+    float: left;
+    display: flex;
+    margin-top: 5px;
+    margin-left: 6%;
+    font-size: 10pt;
+    width: 40%;
+    height: 70%;
+    align-items: center;
+    justify-content: center;
+}
+
+.settings_tab_law_types_save_button {
+    display: flex;
+    margin: auto;
+    width: 40%;
+    height: 70%;
+    align-items: center;
+    justify-content: center;
+}
+
+.settings_tab_law_types_table_column {
+    float: left;
+    display: inherit;
+    width: 22%;
+    height: 100%;
+    margin-right: 5%;
+    margin-left: 5%;
+    text-align: center;
+    overflow: auto;
+}
+
+.law_types_table_element {
+    background-color: #b7b7b7;
+    float: left;
+    display: inherit;
+    width: 100%;
+    height: 30px;
+    margin-top: 5px;
+}
+
+.law_types_table_element_active {
+    background-color: gold;
+}

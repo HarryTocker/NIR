@@ -1,0 +1,33 @@
+@font-face {
+    font-family: 'InterTight';
+    src: url("../fonts/InterTight.ttf") format('truetype');
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    outline: none;
+    border-spacing: 0;
+    transition: ease all 0.5s;
+    box-sizing: border-box !important;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: #eaeaea;
+    font-weight: 300;
+    font-family: InterTight, serif;
+}
+
+input {
+    font-weight: 300;
+    font-family: InterTight, serif;
+}
+
+.page_content {
+    width: 100%;
+    display: block;
+}

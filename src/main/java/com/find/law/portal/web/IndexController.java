@@ -9,8 +9,18 @@ import org.springframework.web.bind.annotation.GetMapping;
  */
 @Controller("/")
 public class IndexController {
-    @GetMapping("index")
-    public String getIndexPage(Model model) {
+    @GetMapping
+    public String getIndexPage() {
         return "index";
+    }
+
+    @GetMapping("settings")
+    public String getSettingsPage() {
+        return "settings";
+    }
+
+    @GetMapping("login")
+    public String getLoginPage() {
+        return "login";
     }
 }

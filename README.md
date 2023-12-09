@@ -30,16 +30,18 @@
 
 #### Специфические настройки
 
-* `portal.laws.updater.update-enable` - true или false. Нужно ли обновлять данные о законах. (Если не указано - значение по умолчанию **true**)
-* `portal.laws.updater.update-on-start` - true или false. Нужно ли обновить данные о законах при запуске. (Если не указано - значение по умолчанию **false**)
-* `portal.laws.updater.parser.type` - тип парсера. На данный момент есть только **remote** - обновление из удаленного источника. (Значение обязательное)
-* `portal.laws.updater.parser.path` - путь по которому будет работать парсер. Для **remote** указать адрес получения данных. (Значение обязательное)
+* `portal.laws.updater.update-enable` - **true** или **false**. Нужно ли обновлять данные о законах. (Если не указано - значение по умолчанию **true**)
+* `portal.laws.updater.update-on-start` - **true** или **false**. Нужно ли обновить данные о законах при запуске. (Если не указано - значение по умолчанию **false**)
+* `portal.laws.updater.parser.type` - тип парсера. **HTML_LOCAL** - парсер из HTML документа в файловой системе. **HTML_REMOTE** - парсер из HTML документа получаемый из удаленного источника (Значение обязательное)
+* `portal.laws.updater.parser.path` - для **HTML_LOCAL** указать полный путь в файловой системе до HTML файла. Для **HTML_REMOTE** указать адрес получения данных. (Значение обязательное)
+* `portal.laws.updater.parser.law-types.path` - путь до JSON файла с первичными настройками статей законов по категориям 
 
 ### 2. Код
 
 #### Конфигурация:
 
-* `UpdaterConfiguration` - данный класс отвечает за конфигурацию парсера `LawParser` и сервиса обновлений законов `LawUpdater`.
+* `LawUpdaterConfiguration` - данный класс отвечает за конфигурацию сервиса обновлений законов `LawUpdater`.
+* `LawParserProviderConfiguration` - данный класс отвечает за конфигурацию провайдера парсеров `LawParserProvider`.
 
 #### Сервисы:
 
@@ -58,6 +60,13 @@
 Статика расположена по пути: `src\main\resources\templates` - html шаблоны. `src\main\resources\static` - css и js файлы.
 
 ### 4. Changelog
+
+#### 2.0.0
+
+* Добавлен парсер из локального файла.
+* Обновлена работа парсеров, добавлен `LawParserProvider`.
+* Парсинг разбит на модули `LawDataUpdater`.
+* Добавлены модульные тесты.
 
 #### 1.1.1
 

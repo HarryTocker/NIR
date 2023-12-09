@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Portal Header</title>
+</head>
+<body>
+<div class="header_container" th:fragment="header">
+    <div class="header">
+        <a href="/" th:title="#{portal.ui.element.hint.home}"><p class="interactive_element header_title" th:text="#{portal.ui.label}"></p></a>
+        <div class="header_menu_container">
+            <a class="rounded small ico outline_selected" href="/settings" th:title="#{portal.ui.element.hint.settings}">
+                <span>
+                    <img class="small ico" src="/images/ui/settings_button.png" alt="Settings">
+                </span>
+            </a>
+            <a id="language_button" class="rounded small ico outline_selected" th:title="#{portal.ui.element.hint.language}">
+                <span>
+                    <img id="selected_language_ico" class="small ico" src="" alt="Language">
+                </span>
+            </a>
+        </div>
+    </div>
+    <ul id="languages_list" class="rounded_edges drop_down_list languages_list">
+        <li class="pressed_element languages_list_item" onclick="changeLanguage('ru')">
+            <img class="rounded small ico" src="/images/flags/ru.png" alt="Русский">
+            <p>Русский</p>
+        </li>
+        <li class="pressed_element languages_list_item" onclick="changeLanguage('en')">
+            <img class="rounded small ico" src="/images/flags/en.png" alt="English">
+            <p>English</p>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

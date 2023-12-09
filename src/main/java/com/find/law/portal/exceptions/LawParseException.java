@@ -1,12 +1,10 @@
 package com.find.law.portal.exceptions;
 
-import org.jsoup.nodes.Element;
-
 /**
- * Исключение при парсинге закона.
+ * Исключение при парсинге законов.
  */
-public class LawParseException extends RuntimeException {
-    public LawParseException(Element current, Exception cause) {
-        super("Could not parse element [%s] with text [%s]".formatted(current.id(), current.text()), cause);
+public class LawParseException extends Exception {
+    public LawParseException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
